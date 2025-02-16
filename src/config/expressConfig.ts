@@ -42,10 +42,14 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-app.use('/api/user', userRouter);
-app.use('/api/quiz', quizRouter);
+app.use('/user', userRouter);
+app.use('/quiz', quizRouter);
 
-const PORT = parseInt(process.env?.SERVER_PORT ?? '3000');
+app.use('/', (_req, res) => {
+	res.json({ message: 'Hello from Quiz API' });
+});
+
+const PORT = parseInt(process.env?.SERVER_PORT ?? '8000');
 const ADDR = process.env?.SERVER_ADDR ?? '127.0.0.1';
 
 const startServer = () => {
