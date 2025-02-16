@@ -1,7 +1,17 @@
 import express from 'express';
 
+import cors from 'cors';
+
 import userRouter from '../routes/userRoutes';
 import quizRouter from '../routes/quizRoutes';
+
+const allowedOrigins = [
+	'http://localhost:3000',
+	'http://localhost:8080',
+	'https://api.quiz.tools',
+	'https://igor.quiz.tools',
+	'https://api.dev.quiz.tools',
+];
 
 const app = express();
 
@@ -11,6 +21,23 @@ app.disable('x-powered-by');
 // Trust proxy (to forward the request with the correct IP address)
 app.set('trust proxy', true);
 
+const corsOptions = {
+	origin: (origin: string | undefined, callback: (error: Error | null, allowed: boolean) => void) => {
+		// Allow requests with no origin (like mobile apps, curl, Postman)
+		if (!origin) {
+			return callback(null, true);
+		}
+
+		if (allowedOrigins.includes(origin)) {
+			return callback(null, true);
+		}
+
+		callback(new Error('Not allowed by CORS'), false);
+	},
+	credentials: true,
+};
+
+app.use(cors(corsOptions));
 // Body parser
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
