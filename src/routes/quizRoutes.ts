@@ -5,7 +5,7 @@ import { getQuizList, updateQuiz } from '../controllers/quizController';
 
 const quizRouter = express.Router();
 
-//qu
+//quiz
 quizRouter.get('/', authMiddleware, getQuizList);
 quizRouter.post('/', authMiddleware, createQuiz);
 quizRouter.get('/:id', authMiddleware, getQuiz);

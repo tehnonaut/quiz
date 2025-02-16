@@ -8,6 +8,7 @@ export enum QuestionType {
 
 export interface IQuestion extends Document {
 	_id: Types.ObjectId;
+
 	type: QuestionType;
 	question: string;
 	answers: string[];

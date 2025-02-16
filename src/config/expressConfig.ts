@@ -8,6 +8,7 @@ import quizRouter from '../routes/quizRoutes';
 const allowedOrigins = [
 	'http://localhost:3000',
 	'http://localhost:8080',
+	'https://quiz.tools',
 	'https://api.quiz.tools',
 	'https://igor.quiz.tools',
 	'https://api.dev.quiz.tools',

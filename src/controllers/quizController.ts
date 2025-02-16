@@ -21,9 +21,9 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 
 		let quiz: IQuiz | null = null;
 		if (!u) {
-			quiz = await Quiz.findById(id);
+			quiz = await Quiz.findById(id).populate('questions');
 		} else {
-			quiz = await Quiz.findOne({ _id: id, creator: u.id });
+			quiz = await Quiz.findOne({ _id: id, creator: u.id }).populate('questions');
 		}
 
 		if (!quiz) {
