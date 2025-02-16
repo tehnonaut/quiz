@@ -44,7 +44,7 @@ export const createQuiz = async (req: Request, res: Response, next: NextFunction
 	try {
 		const u = req.user as IUserToken;
 
-		const { title, description, questions } = req.body;
+		const { title, description, questions, duration, isActive } = req.body;
 
 		//create the questions
 		const createdQuestions = [];
@@ -53,7 +53,14 @@ export const createQuiz = async (req: Request, res: Response, next: NextFunction
 			createdQuestions.push(q._id);
 		}
 
-		const quiz = await Quiz.create({ title, description, questions: createdQuestions, creator: u.id });
+		const quiz = await Quiz.create({
+			title,
+			description,
+			questions: createdQuestions,
+			creator: u.id,
+			duration,
+			isActive,
+		});
 		res.json({ message: 'Quiz created', quiz });
 	} catch (error) {
 		next(error);
@@ -65,7 +72,7 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 		const u = req.user as IUserToken;
 
 		const { id } = req.params;
-		const { title, description, questions } = req.body;
+		const { title, description, questions, duration, isActive } = req.body;
 
 		const quiz = await Quiz.findOne({ _id: id, creator: u.id });
 		if (!quiz) {
@@ -75,6 +82,8 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 
 		quiz.title = title;
 		quiz.description = description;
+		quiz.duration = duration;
+		quiz.isActive = isActive;
 
 		for (const question of questions) {
 			if (question._id) {

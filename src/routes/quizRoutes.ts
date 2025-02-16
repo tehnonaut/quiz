@@ -16,6 +16,8 @@ quizRouter.get('/', authMiddleware, getQuizList);
  * POST /quiz
  * @param {string} name - The name of the quiz
  * @param {string} description - The description of the quiz
+ * @param {number} duration - The duration of the quiz (in minutes)
+ * @param {boolean} isActive - The active status of the quiz
  * @param {IQuestion[]} questions - The questions of the quiz (array of question objects)
  *      @param {string} type  - The question type (choice, answer)
  *      @param {string[]} question - The question text
@@ -29,6 +31,8 @@ quizRouter.post('/', authMiddleware, createQuiz);
  * PUT /quiz/:quizId
  * @param {string} name - The name of the quiz
  * @param {string} description - The description of the quiz
+ * @param {number} duration - The duration of the quiz (in minutes)
+ * @param {boolean} isActive - The active status of the quiz
  * @param {IQuestion[]} questions - The questions of the quiz (array of question objects)
  *      @param {string} type  - The question type (choice, answer)
  *      @param {string[]} question - The question text
