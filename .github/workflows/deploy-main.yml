@@ -1,0 +1,26 @@
+name: Deploy to VPS - PROD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install and Build on VPS
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            echo $SHELL
+            bash -i -c "
+              cd /srv/${{ secrets.PROJECT_DIR_PROD }}
+              git stash
+              git pull
+              npm i
+              npm run build
+              npx pm2 startOrReload ecosystem.config.js
+            "
