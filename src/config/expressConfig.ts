@@ -17,15 +17,6 @@ app.set('trust proxy', true);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Static files
-const rootDir = process.env?.DIR_ROOT ?? '';
-
-app.use(express.static(path.join(rootDir, 'public')));
-
-//EJS
-app.set('view engine', 'ejs');
-app.set('views', path.join(rootDir, 'views'));
-
 app.use('/api/user', userRouter);
 app.use('/api/quiz', quizRouter);
 
