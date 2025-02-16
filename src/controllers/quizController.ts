@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import Quiz, { IQuiz } from '../models/quizModel';
 import { IUserToken } from '../models/userModel';
 import Question from '../models/questionModel';
+import Participant from '../models/participantModel';
+import ParticipantAnswer from '../models/participantAnswerModel';
 
 export const getQuizList = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -23,7 +25,8 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 		if (!u) {
 			quiz = await Quiz.findById(id).populate('questions');
 		} else {
-			quiz = await Quiz.findOne({ _id: id, creator: u.id }).populate('questions');
+			// User is a teacher, so we need to show the correct answers
+			quiz = await Quiz.findOne({ _id: id, creator: u.id }).select('+correctAnswers').populate('questions');
 		}
 
 		if (!quiz) {
@@ -116,6 +119,43 @@ export const deleteQuiz = async (req: Request, res: Response, next: NextFunction
 
 		await Quiz.findByIdAndDelete(id);
 		res.json({ message: 'Quiz deleted' });
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const getQuizResults = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const u = req.user as IUserToken;
+		const { quizId, participantId } = req.params;
+
+		const quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).select('+correctAnswers').populate('questions');
+		if (!quiz) {
+			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
+
+		const participant = await Participant.findById(participantId);
+		if (!participant) {
+			res.status(404).json({ message: 'Participant not found' });
+			return;
+		}
+
+		const participantAnswers = await ParticipantAnswer.find({
+			participant: participantId,
+			question: { $in: quiz.questions },
+		});
+
+		const results = participantAnswers.map((answer) => {
+			const question = quiz.questions.find((q) => q._id.equals(answer.question)) as any;
+			return {
+				question: question?.question,
+				answer: answer.answer,
+				correct: question?.correctAnswers.includes(answer.answer),
+			};
+		});
+
+		res.json({ message: 'Quiz results fetched', results });
 	} catch (error) {
 		next(error);
 	}

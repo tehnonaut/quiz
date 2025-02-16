@@ -4,7 +4,9 @@ import cors from 'cors';
 
 import userRouter from '../routes/userRoutes';
 import quizRouter from '../routes/quizRoutes';
-
+import questionRouter from '../routes/questionRoutes';
+import participantRouter from '../routes/participantRoutes';
+import { errorHandlerMiddleware } from '../middlewares/errorHandlerMiddleware';
 const allowedOrigins = [
 	'http://localhost:3000',
 	'http://localhost:8080',
@@ -45,10 +47,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use('/user', userRouter);
 app.use('/quiz', quizRouter);
+app.use('/question', questionRouter);
+app.use('/participant', participantRouter);
 
 app.use('/', (_req, res) => {
 	res.json({ message: 'Hello from Quiz API' });
 });
+
+app.use(errorHandlerMiddleware);
 
 const PORT = parseInt(process.env?.SERVER_PORT ?? '8000');
 const ADDR = process.env?.SERVER_ADDR ?? '127.0.0.1';

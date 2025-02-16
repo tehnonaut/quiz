@@ -84,6 +84,7 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
 		}
 
 		user.password = password;
+
 		await user.save();
 		res.json({ message: 'Password updated' });
 	} catch (error) {

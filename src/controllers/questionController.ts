@@ -5,7 +5,9 @@ import ParticipantAnswer from '../models/participantAnswerModel';
 
 export const answerQuestion = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { questionId, answer, participantId } = req.body;
+		const questionId = req.params.questionId;
+		const participantId = req.body.participantId;
+		const answer = req.body.answer;
 
 		const question = await Question.findById(questionId);
 		if (!question) {
@@ -43,9 +45,9 @@ export const answerQuestion = async (req: Request, res: Response, next: NextFunc
 
 export const getQuestion = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { questionId } = req.params;
+		const { quizId, questionId } = req.params;
 
-		const question = await Question.findById(questionId);
+		const question = await Question.findOne({ quiz: quizId, _id: questionId });
 		if (!question) {
 			res.status(404).json({ message: 'Question not found' });
 			return;
