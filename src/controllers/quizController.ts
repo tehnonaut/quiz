@@ -8,8 +8,8 @@ import ParticipantAnswer from '../models/participantAnswerModel';
 export const getQuizList = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const u = req.user as IUserToken;
-		const quizes = await Quiz.find({ creator: u.id }).sort({ createdAt: -1 });
-		res.json({ message: 'Quizes fetched', quizes });
+		const quizzes = await Quiz.find({ creator: u.id }).sort({ createdAt: -1 });
+		res.json({ message: 'Quizzes fetched', quizzes });
 	} catch (error) {
 		next(error);
 	}
@@ -23,6 +23,7 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 
 		let quiz: IQuiz | null = null;
 		if (!u) {
+			// User is a student, so we need to show the quiz without the correct answers
 			quiz = await Quiz.findById(id).populate('questions');
 		} else {
 			// User is a teacher, so we need to show the correct answers
@@ -31,6 +32,11 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 
 		if (!quiz) {
 			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
+
+		if (!u && quiz.isActive == false) {
+			res.status(404).json({ message: 'Quiz is not active, please contact the creator to activate it' });
 			return;
 		}
 

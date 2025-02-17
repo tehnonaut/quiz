@@ -1,7 +1,7 @@
 {
 	"name": "quiz-maker",
 	"version": "1.0.0",
-	"description": "Project for making Quizes",
+	"description": "Project for making Quizzes",
 	"main": "dist/app.js",
 	"scripts": {
 		"test": "test",

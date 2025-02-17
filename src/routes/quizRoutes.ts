@@ -6,56 +6,91 @@ import { getQuizList, updateQuiz } from '../controllers/quizController';
 const quizRouter = express.Router();
 
 /**
- * Get Quiz List (teachers)
- * GET /quiz
+ * @api {get} /quiz Get Quiz List
+ * @apiName GetQuizList
+ * @apiGroup Quiz
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
  */
 quizRouter.get('/', authMiddleware, getQuizList);
 
 /**
- * Create Quiz (teachers)
- * POST /quiz
- * @param {string} name - The name of the quiz
- * @param {string} description - The description of the quiz
- * @param {number} duration - The duration of the quiz (in minutes)
- * @param {boolean} isActive - The active status of the quiz
- * @param {IQuestion[]} questions - The questions of the quiz (array of question objects)
- *      @param {string} type  - The question type (choice, answer)
- *      @param {string[]} question - The question text
- *      @param {string[]} answers - The answers of the question (array of strings)
- *      @param {string[]} correctAnswers - The correct answers of the question (array of strings)
+ * @api {post} /quiz Create Quiz
+ * @apiName CreateQuiz
+ * @apiGroup Quiz
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ *
+ * @apiBody {String} name The name of the quiz
+ * @apiBody {String} description The description of the quiz
+ * @apiBody {Number} duration The duration of the quiz (in minutes)
+ * @apiBody {Boolean} isActive The active status of the quiz
+ * @apiBody {Object[]} questions The questions of the quiz (array of question objects)
+ * * @apiBody {string} question.type  - The question type (choice, answer)
+ * * @apiBody {string[]} question.question - The question text
+ * * @apiBody {string[]} question.answers - The answers of the question (array of strings)
+ * * @apiBody {string[]} question.correctAnswers - The correct answers of the question (array of strings)
  */
 quizRouter.post('/', authMiddleware, createQuiz);
 
 /**
- * Update Quiz (teachers)
- * PUT /quiz/:quizId
- * @param {string} name - The name of the quiz
- * @param {string} description - The description of the quiz
- * @param {number} duration - The duration of the quiz (in minutes)
- * @param {boolean} isActive - The active status of the quiz
- * @param {IQuestion[]} questions - The questions of the quiz (array of question objects)
- *      @param {string} type  - The question type (choice, answer)
- *      @param {string[]} question - The question text
- *      @param {string[]} answers - The answers of the question (array of strings)
- *      @param {string[]} correctAnswers - The correct answers of the question (array of strings)
+ * @api {put} /quiz/:quizId Update Quiz
+ * @apiName UpdateQuiz
+ * @apiGroup Quiz
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ *
+ * @apiBody {String} quizId The id of the quiz
+ * @apiBody {String} name The name of the quiz
+ * @apiBody {String} description The description of the quiz
+ * @apiBody {Number} duration The duration of the quiz (in minutes)
+ * @apiBody {Boolean} isActive The active status of the quiz
+ * @apiBody {Object[]} questions The questions of the quiz (array of question objects)
+ * * @apiBody {string} question._id - The id of the question
+ * * @apiBody {string} question.type  - The question type (choice, answer)
+ * * @apiBody {string[]} question.question - The question text
+ * * @apiBody {string[]} question.answers - The answers of the question (array of strings)
+ * * @apiBody {string[]} question.correctAnswers - The correct answers of the question (array of strings)
  */
 quizRouter.put('/:quizId', authMiddleware, updateQuiz);
 
 /**
- * Get Quiz Results (teachers)
- * GET /quiz/:quizId/results/:participantId
+ * @api {get} /quiz/:quizId/results/:participantId Get Quiz Results
+ * @apiName GetQuizResults
+ * @apiGroup Quiz
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ *
+ * @apiParam {String} quizId The id of the quiz
+ * @apiParam {String} participantId The id of the participant
  */
 quizRouter.get('/:quizId/results/:participantId', authMiddleware, getQuizResults);
 
 /**
- * Quiz routes (students)
- * /quiz/:quizId
+ * @api {get} /quiz/:quizId Get Quiz
+ * @apiName GetQuiz
+ * @apiGroup Quiz
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ *
+ * @apiParam {String} quizId The id of the quiz
  */
 quizRouter.get('/:quizId', getQuiz); //no auth required
 
 /**
- * Delete Quiz (teachers)
- * DELETE /quiz/:quizId
+ * @api {delete} /quiz/:quizId Delete Quiz
+ * @apiName DeleteQuiz
+ * @apiGroup Quiz
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ *
+ * @apiParam {String} quizId The id of the quiz
  */
 quizRouter.delete('/:quizId', authMiddleware, deleteQuiz);
 

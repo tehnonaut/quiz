@@ -1,27 +1,28 @@
 import express from 'express';
-import { createParticipant, getParticipant, getParticipantAnswer } from '../controllers/participantController';
+import { createParticipant, getParticipant } from '../controllers/participantController';
 
 const participantRouter = express.Router();
 
 /**
- * Get Participant (students)
- * GET /participant/:participantId
+ * @api {get} /participant/:participantId Get Participant
+ * @apiName GetParticipant
+ * @apiGroup Participant
+ * @apiPermission Public
+ *
+ * @apiParam {String} participantId The id of the participant
  */
 participantRouter.get('/:participantId', getParticipant);
 
 /**
- * Create Participant (students)
- * POST /participant
- * @param {string} name - The name of the participant
- * @param {string} studentId - The studentId of the participant
- * @param {string} quizId - The quizId of the participant
+ * @api {post} /participant Create Participant
+ * @apiName CreateParticipant
+ * @apiGroup Participant
+ * @apiPermission Public
+ *
+ * @apiBody {String} name The name of the participant
+ * @apiBody {String} studentId The studentId of the participant
+ * @apiBody {String} quizId The quizId of the participant
  */
 participantRouter.post('/', createParticipant);
-
-/**
- * Get Participant Answer (student)
- * GET /participant/:participantId/question/:questionId
- */
-participantRouter.get('/:participantId/question/:questionId', getParticipantAnswer);
 
 export default participantRouter;

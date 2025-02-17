@@ -5,38 +5,57 @@ import { authMiddleware } from '../middlewares/authMiddleware';
 const userRouter = express.Router();
 
 /**
- * Get User (teachers)
- * GET /user
+ * @api {get} /user Get User
+ * @apiName GetUser
+ * @apiGroup User
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
  */
 userRouter.get('/', authMiddleware, getUser);
 
 /**
- * Create User (REGISTER) (teachers)
- * POST /user
- * @param {string} name - The name of the user
- * @param {string} email - The email of the user
- * @param {string} password - The password of the user
+ * @api {post} /user Create User
+ * @apiName CreateUser
+ * @apiGroup User
+ * @apiPermission Public
+ *
+ * @apiBody {String} name The name of the user
+ * @apiBody {String} email The email of the user
+ * @apiBody {String} password The password of the user
  */
 userRouter.post('/', createUser);
 
 /**
- * Authenticate User (LOGIN) (students)
- * POST /user/auth
- * @param {string} email - The email of the user
- * @param {string} password - The password of the user
+ * @api {post} /user/auth Authenticate User
+ * @apiName AuthenticateUser
+ * @apiGroup User
+ * @apiPermission Public
+ *
+ * @apiBody {String} email The email of the user
+ * @apiBody {String} password The password of the user
  */
 userRouter.post('/auth', authUser);
 
 /**
- * Refresh User Token (students) Bearer token required
- * GET /user/refresh-token
+ * @api {get} /user/refresh-token Refresh User Token
+ * @apiName RefreshUserToken
+ * @apiGroup User
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
  */
 userRouter.get('/refresh-token', authMiddleware, refreshUserToken);
 
 /**
- * Change Password (teachers) Bearer token required
- * PUT /user
- * @param {string} password - The password of the user
+ * @api {put} /user Change Password
+ * @apiName ChangePassword
+ * @apiGroup User
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ *
+ * @apiBody {String} password The password of the user
  */
 userRouter.put('/', authMiddleware, changePassword);
 
