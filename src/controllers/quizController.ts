@@ -109,7 +109,18 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 
 		const questionsToUpdate = questions.filter((q: any) => q._id);
 		const questionsToCreate = questions.filter((q: any) => !q._id);
-		const questionsToDelete = quiz.questions.filter((q: any) => !questions.some((q2: any) => q2._id === q));
+
+		//delete the ones that are not created or updated
+		const questionsToDelete = quiz.questions.filter(
+			(q: any) =>
+				!questionsToUpdate.some((q2: any) => q2._id === q) && !questionsToCreate.some((q2: any) => q2._id === q)
+		);
+
+		//delete the questions that are not in the questions array
+		for (const question of questionsToDelete) {
+			await Question.findByIdAndDelete(question);
+			quiz.questions = quiz.questions.filter((q) => q.toString() !== question.toString());
+		}
 
 		for (const question of questionsToUpdate) {
 			const q = await Question.findById(question._id);
