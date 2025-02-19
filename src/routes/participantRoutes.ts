@@ -30,6 +30,10 @@ participantRouter.post('/', createParticipant);
  * @apiName UpdateParticipant
  * @apiGroup Participant
  * @apiPermission Public
+ *
+ * @apiBody {String} name The name of the participant
+ * @apiBody {String} studentId The studentId of the participant
+ * @apiBody {Boolean} isCompleted The completion status of the participant
  */
 participantRouter.put('/:participantId', updateParticipant);
 
