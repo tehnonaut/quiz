@@ -159,7 +159,7 @@ export const getQuizResults = async (req: Request, res: Response, next: NextFunc
 		const u = req.user as IUserToken;
 		const { quizId, participantId } = req.params;
 
-		const quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).select('+correctAnswers').populate('questions');
+		const quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).populate('questions', '+correctAnswers');
 		if (!quiz) {
 			res.status(404).json({ message: 'Quiz not found' });
 			return;
