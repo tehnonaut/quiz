@@ -115,6 +115,7 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 				//update the question
 				await q.updateOne(question);
 			} else {
+				question.quiz = quiz._id;
 				const q = await Question.create(question);
 				quiz.questions.push(q._id);
 				question._id = q._id; //used to sort the questions in the order they are sent in the questions req.body
