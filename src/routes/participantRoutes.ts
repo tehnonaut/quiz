@@ -1,5 +1,5 @@
 import express from 'express';
-import { createParticipant, getParticipant } from '../controllers/participantController';
+import { createParticipant, getParticipant, updateParticipant } from '../controllers/participantController';
 
 const participantRouter = express.Router();
 
@@ -24,5 +24,13 @@ participantRouter.get('/:participantId', getParticipant);
  * @apiBody {String} quizId The quizId of the participant
  */
 participantRouter.post('/', createParticipant);
+
+/**
+ * @api {put} /participant/:participantId Update Participant
+ * @apiName UpdateParticipant
+ * @apiGroup Participant
+ * @apiPermission Public
+ */
+participantRouter.put('/:participantId', updateParticipant);
 
 export default participantRouter;

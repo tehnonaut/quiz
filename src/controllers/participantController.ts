@@ -53,8 +53,8 @@ export const getParticipants = async (req: Request, res: Response, next: NextFun
 export const updateParticipant = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params;
-		const { name, studentId } = req.body;
-		const participant = await Participant.findByIdAndUpdate(id, { name, studentId }, { new: true });
+		const { name, studentId, isCompleted } = req.body;
+		const participant = await Participant.findByIdAndUpdate(id, { name, studentId, isCompleted }, { new: true });
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });
 			return;

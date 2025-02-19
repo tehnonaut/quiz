@@ -6,6 +6,7 @@ export interface IParticipant extends Document {
 	quiz: IQuiz['_id']; // id of the quiz
 	name: string; // name of the participant
 	studentId: string; // student id of the participant
+	isCompleted: boolean; // if the participant has completed the quiz
 	createdAt: Date; // date of creation
 	updatedAt: Date; // date of update
 }
@@ -15,6 +16,7 @@ const participantSchema = new Schema<IParticipant>(
 		quiz: { type: Schema.Types.ObjectId, ref: 'Quiz', required: true },
 		name: { type: String, required: true },
 		studentId: { type: String, required: true },
+		isCompleted: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
 );
