@@ -61,9 +61,14 @@ export const createQuiz = async (req: Request, res: Response, next: NextFunction
 			isActive,
 		});
 
+		if (!quiz) {
+			res.status(400).json({ message: 'Failed to create quiz' });
+		}
 		//create the questions
 		for (const question of questions) {
+			question.quiz = quiz._id;
 			const q = await Question.create(question);
+
 			quiz.questions.push(q._id);
 		}
 
@@ -74,9 +79,7 @@ export const createQuiz = async (req: Request, res: Response, next: NextFunction
 			return aIndex - bIndex;
 		});
 
-		if (quiz) {
-			await quiz.save();
-		}
+		await quiz.save();
 
 		res.json({ message: 'Quiz created', quiz });
 	} catch (error) {
