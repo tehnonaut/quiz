@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Quiz, { IQuiz } from '../models/quizModel';
 import { IUserToken } from '../models/userModel';
 import Question from '../models/questionModel';
-import Participant from '../models/participantModel';
+import Participant, { IParticipant } from '../models/participantModel';
 import ParticipantAnswer from '../models/participantAnswerModel';
 
 export const getQuizList = async (req: Request, res: Response, next: NextFunction) => {
@@ -22,12 +22,14 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 		const { quizId } = req.params;
 
 		let quiz: IQuiz | null = null;
+		let participants: IParticipant[] | null = null;
 		if (!u) {
 			// User is a student, so we need to show the quiz without the correct answers
 			quiz = await Quiz.findById(quizId).populate('questions');
 		} else {
 			// User is a teacher, so we need to show the correct answers
 			quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).populate('questions', '+correctAnswers');
+			participants = await Participant.find({ quiz: quizId });
 		}
 
 		if (!quiz) {
@@ -40,7 +42,7 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 			return;
 		}
 
-		res.json({ message: 'Quiz fetched', quiz });
+		res.json({ message: 'Quiz fetched', quiz, participants });
 	} catch (error) {
 		next(error);
 	}
