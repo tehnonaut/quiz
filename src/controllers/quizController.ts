@@ -140,14 +140,14 @@ export const deleteQuiz = async (req: Request, res: Response, next: NextFunction
 	try {
 		const u = req.user as IUserToken;
 
-		const { id } = req.params;
-		const quiz = await Quiz.findOne({ _id: id, creator: u.id });
+		const { quizId } = req.params;
+		const quiz = await Quiz.findOne({ _id: quizId, creator: u.id });
 		if (!quiz) {
 			res.status(404).json({ message: 'Quiz not found' });
 			return;
 		}
 
-		await Quiz.findByIdAndDelete(id);
+		await quiz.deleteOne();
 		res.json({ message: 'Quiz deleted' });
 	} catch (error) {
 		next(error);
