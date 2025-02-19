@@ -27,7 +27,7 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 			quiz = await Quiz.findById(quizId).populate('questions');
 		} else {
 			// User is a teacher, so we need to show the correct answers
-			quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).select('+correctAnswers').populate('questions');
+			quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).populate('questions', '+correctAnswers');
 		}
 
 		if (!quiz) {

@@ -76,7 +76,7 @@ quizRouter.get('/:quizId/results/:participantId', authMiddleware, getQuizResults
  * @apiGroup Quiz
  * @apiPermission User
  *
- * @apiHeader {String} Authorization Bearer token
+ * @apiHeader {String} Authorization Bearer token (optional)
  *
  * @apiParam {String} quizId The id of the quiz
  */
