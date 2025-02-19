@@ -31,3 +31,29 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 	req.user = user as IUserToken;
 	return next();
 };
+
+export const authMiddlewarePassable = async (req: Request, res: Response, next: NextFunction) => {
+	const token = req.headers.authorization?.split(' ')[1];
+	if (!token) {
+		res.status(401).json({ message: 'Unauthorized' });
+		return;
+	}
+
+	const decoded = jwt.verify(token, JWT_SECRET) as IUserToken;
+
+	if (decoded && decoded?.id) {
+		const userId = decoded.id;
+
+		const user: IUserToken = {
+			id: userId,
+			iat: decoded.iat,
+			exp: decoded.exp,
+			name: decoded.name,
+			email: decoded.email,
+		};
+
+		req.user = user as IUserToken;
+	}
+
+	return next();
+};

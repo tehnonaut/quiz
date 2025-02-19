@@ -1,5 +1,5 @@
 import express from 'express';
-import { authMiddleware } from '../middlewares/authMiddleware';
+import { authMiddleware, authMiddlewarePassable } from '../middlewares/authMiddleware';
 import { createQuiz, deleteQuiz, getQuiz, getQuizResults } from '../controllers/quizController';
 import { getQuizList, updateQuiz } from '../controllers/quizController';
 
@@ -80,7 +80,7 @@ quizRouter.get('/:quizId/results/:participantId', authMiddleware, getQuizResults
  *
  * @apiParam {String} quizId The id of the quiz
  */
-quizRouter.get('/:quizId', getQuiz); //no auth required
+quizRouter.get('/:quizId', authMiddlewarePassable, getQuiz); //no auth required
 
 /**
  * @api {delete} /quiz/:quizId Delete Quiz
