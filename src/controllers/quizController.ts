@@ -105,24 +105,33 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 		quiz.duration = duration;
 		quiz.isActive = isActive;
 
-		for (const question of questions) {
-			if (question._id) {
-				const q = await Question.findById(question._id);
-				if (!q) {
-					res.status(404).json({ message: 'Question not found' });
-					return;
-				}
-				//update the question
-				await q.updateOne(question);
-			} else {
-				question.quiz = quiz._id;
-				const q = await Question.create(question);
-				quiz.questions.push(q._id);
-				question._id = q._id; //used to sort the questions in the order they are sent in the questions req.body
+		const questionsToUpdate = questions.filter((q: any) => q._id);
+		const questionsToCreate = questions.filter((q: any) => !q._id);
+		const questionsToDelete = quiz.questions.filter((q: any) => !questions.some((q2: any) => q2._id === q));
+
+		for (const question of questionsToUpdate) {
+			const q = await Question.findById(question._id);
+			if (!q) {
+				res.status(404).json({ message: 'Question not found' });
+				return;
 			}
+			await q.updateOne(question);
+			quiz.questions = quiz.questions.map((q) => (q.toString() === question._id.toString() ? q : q));
 		}
 
-		//sort the questions in the order they are sent in the questions req.body
+		for (const question of questionsToCreate) {
+			question.quiz = quiz._id;
+			const q = await Question.create(question);
+			quiz.questions.push(q._id);
+			quiz.questions = quiz.questions.map((q) => (q.toString() === q._id.toString() ? q : q));
+		}
+
+		for (const question of questionsToDelete) {
+			await Question.findByIdAndDelete(question);
+			quiz.questions = quiz.questions.filter((q) => q.toString() !== question.toString());
+		}
+
+		//sort the questions in the order they are sent in the questions req.body, some might not have ids
 		quiz.questions.sort((a, b) => {
 			const aIndex = questions.findIndex((q: any) => q._id === a);
 			const bIndex = questions.findIndex((q: any) => q._id === b);
