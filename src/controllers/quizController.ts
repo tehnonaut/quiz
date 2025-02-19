@@ -52,21 +52,32 @@ export const createQuiz = async (req: Request, res: Response, next: NextFunction
 
 		const { title, description, questions, duration, isActive } = req.body;
 
-		//create the questions
-		const createdQuestions = [];
-		for (const question of questions) {
-			const q = await Question.create(question);
-			createdQuestions.push(q._id);
-		}
-
 		const quiz = await Quiz.create({
 			title,
 			description,
-			questions: createdQuestions,
+			questions: [],
 			creator: u.id,
 			duration,
 			isActive,
 		});
+
+		//create the questions
+		for (const question of questions) {
+			const q = await Question.create(question);
+			quiz.questions.push(q._id);
+		}
+
+		//sort the questions in the order they are sent in the questions req.body
+		quiz.questions.sort((a, b) => {
+			const aIndex = questions.findIndex((q: any) => q._id === a);
+			const bIndex = questions.findIndex((q: any) => q._id === b);
+			return aIndex - bIndex;
+		});
+
+		if (quiz) {
+			await quiz.save();
+		}
+
 		res.json({ message: 'Quiz created', quiz });
 	} catch (error) {
 		next(error);
