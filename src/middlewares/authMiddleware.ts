@@ -32,11 +32,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 	return next();
 };
 
-export const authMiddlewarePassable = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddlewarePassable = async (req: Request, _res: Response, next: NextFunction) => {
 	const token = req.headers.authorization?.split(' ')[1];
 	if (!token) {
-		res.status(401).json({ message: 'Unauthorized' });
-		return;
+		return next();
 	}
 
 	const decoded = jwt.verify(token, JWT_SECRET) as IUserToken;
