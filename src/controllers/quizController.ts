@@ -165,7 +165,24 @@ export const deleteQuiz = async (req: Request, res: Response, next: NextFunction
 	}
 };
 
-export const getQuizResults = async (req: Request, res: Response, next: NextFunction) => {
+export const getQuizParticipants = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const u = req.user as IUserToken;
+		const { quizId } = req.params;
+
+		const quiz = await Quiz.findOne({ _id: quizId, creator: u.id });
+		if (!quiz) {
+			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
+
+		const participants = await Participant.find({ quiz: quizId });
+		res.json({ message: 'Quiz participants fetched', quiz, participants });
+	} catch (error) {
+		next(error);
+	}
+};
+export const getQuizParticipantResults = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const u = req.user as IUserToken;
 		const { quizId, participantId } = req.params;
@@ -196,7 +213,7 @@ export const getQuizResults = async (req: Request, res: Response, next: NextFunc
 			};
 		});
 
-		res.json({ message: 'Quiz results fetched', results });
+		res.json({ message: 'Quiz results fetched', quiz, participant, results });
 	} catch (error) {
 		next(error);
 	}

@@ -1,6 +1,12 @@
 import express from 'express';
 import { authMiddleware, authMiddlewarePassable } from '../middlewares/authMiddleware';
-import { createQuiz, deleteQuiz, getQuiz, getQuizResults } from '../controllers/quizController';
+import {
+	createQuiz,
+	deleteQuiz,
+	getQuiz,
+	getQuizParticipants,
+	getQuizParticipantResults,
+} from '../controllers/quizController';
 import { getQuizList, updateQuiz } from '../controllers/quizController';
 
 const quizRouter = express.Router();
@@ -58,6 +64,18 @@ quizRouter.post('/', authMiddleware, createQuiz);
 quizRouter.put('/:quizId', authMiddleware, updateQuiz);
 
 /**
+ * @api {get} /quiz/:quizId/participants Get Quiz Participants
+ * @apiName GetQuizParticipants
+ * @apiGroup Quiz
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ *
+ * @apiParam {String} quizId The id of the quiz
+ */
+quizRouter.get('/:quizId/participant', authMiddleware, getQuizParticipants);
+
+/**
  * @api {get} /quiz/:quizId/results/:participantId Get Quiz Results
  * @apiName GetQuizResults
  * @apiGroup Quiz
@@ -68,7 +86,7 @@ quizRouter.put('/:quizId', authMiddleware, updateQuiz);
  * @apiParam {String} quizId The id of the quiz
  * @apiParam {String} participantId The id of the participant
  */
-quizRouter.get('/:quizId/results/:participantId', authMiddleware, getQuizResults);
+quizRouter.get('/:quizId/participant/:participantId', authMiddleware, getQuizParticipantResults);
 
 /**
  * @api {get} /quiz/:quizId Get Quiz
