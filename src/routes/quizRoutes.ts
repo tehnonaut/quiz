@@ -6,8 +6,10 @@ import {
 	getQuiz,
 	getQuizParticipants,
 	getQuizParticipantResults,
+	getQuizQuestion,
 } from '../controllers/quizController';
 import { getQuizList, updateQuiz } from '../controllers/quizController';
+import { answerQuestion } from '../controllers/questionController';
 
 const quizRouter = express.Router();
 
@@ -111,5 +113,30 @@ quizRouter.get('/:quizId', authMiddlewarePassable, getQuiz); //no auth required
  * @apiParam {String} quizId The id of the quiz
  */
 quizRouter.delete('/:quizId', authMiddleware, deleteQuiz);
+
+/**
+ * @api {get} /question/:quizId/question/:questionId Get Question
+ * @apiName GetQuestion
+ * @apiGroup Question
+ * @apiPermission Public
+ *
+ * @apiParam {String} quizId The id of the quiz
+ * @apiParam {String} questionId The id of the question
+ */
+quizRouter.get('/:quizId/question/:questionId', getQuizQuestion);
+
+/**
+ * @api {post} /quiz/:quizId/question/:questionId Answer Question
+ * @apiName AnswerQuestion
+ * @apiGroup Quiz
+ * @apiPermission Public
+ *
+ * @apiParam {String} quizId The id of the quiz
+ * @apiParam {String} questionId The id of the question
+ *
+ * @apiBody {String} answer The answer of the question
+ * @apiBody {String} participantId The id of the participant
+ */
+quizRouter.post('/:quizId/question/:questionId', answerQuestion);
 
 export default quizRouter;

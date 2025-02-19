@@ -218,3 +218,33 @@ export const getQuizParticipantResults = async (req: Request, res: Response, nex
 		next(error);
 	}
 };
+
+export const getQuizQuestion = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const u = req.user as IUserToken;
+		const { quizId, questionId } = req.params;
+
+		let quiz: IQuiz | null = null;
+		if (u) {
+			quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).populate('questions', '+correctAnswers');
+		} else {
+			quiz = await Quiz.findById(quizId).populate('questions');
+		}
+
+		if (!quiz) {
+			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
+
+		const question = quiz.questions.find((q) => q._id.equals(questionId));
+
+		if (!question) {
+			res.status(404).json({ message: 'Question not found' });
+			return;
+		}
+
+		res.json({ message: 'Quiz question fetched', quiz, question });
+	} catch (error) {
+		next(error);
+	}
+};
