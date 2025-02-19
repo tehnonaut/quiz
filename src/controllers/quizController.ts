@@ -19,15 +19,15 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 	try {
 		const u = req.user as IUserToken;
 
-		const { id } = req.params;
+		const { quizId } = req.params;
 
 		let quiz: IQuiz | null = null;
 		if (!u) {
 			// User is a student, so we need to show the quiz without the correct answers
-			quiz = await Quiz.findById(id).populate('questions');
+			quiz = await Quiz.findById(quizId).populate('questions');
 		} else {
 			// User is a teacher, so we need to show the correct answers
-			quiz = await Quiz.findOne({ _id: id, creator: u.id }).select('+correctAnswers').populate('questions');
+			quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).select('+correctAnswers').populate('questions');
 		}
 
 		if (!quiz) {
@@ -91,10 +91,10 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 	try {
 		const u = req.user as IUserToken;
 
-		const { id } = req.params;
+		const { quizId } = req.params;
 		const { title, description, questions, duration, isActive } = req.body;
 
-		const quiz = await Quiz.findOne({ _id: id, creator: u.id });
+		const quiz = await Quiz.findOne({ _id: quizId, creator: u.id });
 		if (!quiz) {
 			res.status(404).json({ message: 'Quiz not found' });
 			return;
