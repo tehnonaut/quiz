@@ -3,20 +3,25 @@ import Question from '../models/questionModel';
 import Participant from '../models/participantModel';
 import ParticipantAnswer from '../models/participantAnswerModel';
 import { IQuiz } from '../models/quizModel';
+import Quiz from '../models/quizModel';
 
 export const answerQuestion = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const questionId = req.params.questionId;
+		const { quizId, questionId } = req.params;
 		const participantId = req.body.participantId;
 		const answer = req.body.answer;
+
+		const quiz = await Quiz.findById(quizId).populate('questions');
+		if (!quiz) {
+			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
 
 		const question = await Question.findById(questionId).populate('quiz');
 		if (!question) {
 			res.status(404).json({ message: 'Question not found' });
 			return;
 		}
-
-		const quiz = question.quiz as unknown as IQuiz;
 
 		if (quiz.isActive == false) {
 			res.status(404).json({ message: 'Quiz is not active, please contact the creator to activate it' });
@@ -38,6 +43,7 @@ export const answerQuestion = async (req: Request, res: Response, next: NextFunc
 				question: questionId,
 				answer,
 				participant: participantId,
+				quiz: quizId,
 			});
 		} else {
 			//update answer
