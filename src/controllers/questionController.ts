@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import Question from '../models/questionModel';
 import Participant from '../models/participantModel';
 import ParticipantAnswer from '../models/participantAnswerModel';
-import { IQuiz } from '../models/quizModel';
 import Quiz from '../models/quizModel';
 
 export const answerQuestion = async (req: Request, res: Response, next: NextFunction) => {
