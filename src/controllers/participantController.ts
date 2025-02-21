@@ -103,3 +103,30 @@ export const getParticipantAnswers = async (req: Request, res: Response, next: N
 		next(error);
 	}
 };
+
+export const submitParticipantAnswer = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { participantId, questionId, answer } = req.body;
+		const participant = await Participant.findById(participantId);
+		if (!participant) {
+			res.status(404).json({ message: 'Participant not found' });
+			return;
+		}
+
+		const question = await Question.findById(questionId);
+		if (!question) {
+			res.status(404).json({ message: 'Question not found' });
+			return;
+		}
+
+		const participantAnswer = await ParticipantAnswer.create({
+			participant: participantId,
+			quiz: participant.quiz,
+			question: questionId,
+			answer,
+		});
+		res.json({ message: 'Participant answer submitted', participantAnswer });
+	} catch (error) {
+		next(error);
+	}
+};
