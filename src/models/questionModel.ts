@@ -24,7 +24,7 @@ const questionSchema = new Schema<IQuestion>(
 	{
 		type: { type: String, enum: QuestionType, required: true },
 		question: { type: String, required: true, trim: true },
-		answers: { type: [String], required: false, default: [] },
+		answers: [{ type: String, required: false, default: [] }],
 		correctAnswers: [{ type: String, required: false, default: [], trim: true, select: false }], // select: false means that the correctAnswer will not be returned in the response
 		quiz: { type: Schema.Types.ObjectId, ref: 'Quiz', required: true },
 		isDeleted: { type: Boolean, default: false },
