@@ -106,7 +106,8 @@ export const getParticipantAnswers = async (req: Request, res: Response, next: N
 
 export const submitParticipantAnswer = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { participantId, questionId, answer } = req.body;
+		const { participantId, questionId } = req.params;
+		const { answer } = req.body;
 		const participant = await Participant.findById(participantId);
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });

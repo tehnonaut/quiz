@@ -3,6 +3,7 @@ import {
 	createParticipant,
 	getParticipant,
 	getParticipantAnswers,
+	submitParticipantAnswer,
 	updateParticipant,
 } from '../controllers/participantController';
 
@@ -43,7 +44,7 @@ participantRouter.post('/', createParticipant);
 participantRouter.put('/:participantId', updateParticipant);
 
 /**
- * @api {post} /participant/:participantId/answer Submit Participant Answer
+ * @api {post} /participant/:participantId/question/:questionId/answer Submit Participant Answer
  * @apiName SubmitParticipantAnswer
  * @apiGroup Participant
  * @apiPermission Public
@@ -52,7 +53,7 @@ participantRouter.put('/:participantId', updateParticipant);
  * @apiParam {String} questionId The id of the question
  * @apiParam {String} answer The answer of the participant
  */
-participantRouter.post('/:participantId/answer');
+participantRouter.post('/:participantId/question/:questionId/answer', submitParticipantAnswer);
 /**
  * @api {get} /participant/:participantId/answers Get Participant Answers
  * @apiName GetParticipantAnswers
