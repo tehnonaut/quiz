@@ -8,7 +8,7 @@ import quizRouter from '../routes/quizRoutes';
 import participantRouter from '../routes/participantRoutes';
 import { errorHandlerMiddleware } from '../middlewares/errorHandlerMiddleware';
 const allowedOrigins = [
-	'http://localhost:3000',
+	'http://localhost:4000',
 	'http://localhost:8080',
 	'https://quiz.tools',
 	'https://api.quiz.tools',
