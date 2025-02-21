@@ -1,5 +1,10 @@
 import express from 'express';
-import { createParticipant, getParticipant, updateParticipant } from '../controllers/participantController';
+import {
+	createParticipant,
+	getParticipant,
+	getParticipantAnswers,
+	updateParticipant,
+} from '../controllers/participantController';
 
 const participantRouter = express.Router();
 
@@ -36,5 +41,15 @@ participantRouter.post('/', createParticipant);
  * @apiBody {Boolean} isCompleted The completion status of the participant
  */
 participantRouter.put('/:participantId', updateParticipant);
+
+/**
+ * @api {get} /participant/:participantId/answers Get Participant Answers
+ * @apiName GetParticipantAnswers
+ * @apiGroup Participant
+ * @apiPermission Public
+ *
+ * @apiParam {String} participantId The id of the participant
+ */
+participantRouter.get('/:participantId/answers', getParticipantAnswers);
 
 export default participantRouter;
