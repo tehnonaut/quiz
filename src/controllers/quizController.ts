@@ -121,7 +121,9 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 				quiz.questions = quiz.questions.map((q) => (q.toString() === question._id.toString() ? q : q));
 			} else {
 				const q = await Question.create(question);
-				newQuestionIds.push(q._id);
+				if (q) {
+					newQuestionIds.push(q._id);
+				}
 			}
 		}
 
