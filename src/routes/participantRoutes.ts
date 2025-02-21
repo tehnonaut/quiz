@@ -53,7 +53,7 @@ participantRouter.put('/:participantId', updateParticipant);
  * @apiParam {String} questionId The id of the question
  * @apiParam {String} answer The answer of the participant
  */
-participantRouter.post('/:participantId/question/:questionId/answer', submitParticipantAnswer);
+participantRouter.post('/:participantId/question/:questionId', submitParticipantAnswer);
 /**
  * @api {get} /participant/:participantId/answers Get Participant Answers
  * @apiName GetParticipantAnswers
