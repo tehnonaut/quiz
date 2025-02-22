@@ -5,7 +5,15 @@ import { generateTokenFromUser } from '../utils/tokenUtil';
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const u = req.user as IUserToken;
-		res.json({ message: 'User fetched', user: u });
+
+		const user = await User.findById(u.id);
+
+		if (!user) {
+			res.status(404).json({ message: 'User not found' });
+			return;
+		}
+
+		res.json({ message: 'User fetched', user });
 	} catch (error) {
 		next(error);
 	}
