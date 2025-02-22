@@ -14,7 +14,8 @@ export const createParticipant = async (req: Request, res: Response, next: NextF
 
 		const existingParticipant = await Participant.findOne({ quiz: quizId, studentId });
 		if (existingParticipant) {
-			res.status(400).json({ message: 'Participant already exists', participant: existingParticipant });
+			// 202 Accepted
+			res.status(202).json({ message: 'Participant already exists', participant: existingParticipant });
 			return;
 		}
 
