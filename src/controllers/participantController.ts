@@ -131,7 +131,7 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 	}
 };
 
-export const markParticipantFinished = async (req: Request, res: Response, next: NextFunction) => {
+export const markParticipantAsFinished = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { participantId } = req.params;
 		const participant = await Participant.findById(participantId);
