@@ -111,13 +111,21 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 			return;
 		}
 
-		const participantAnswer = await ParticipantAnswer.create({
-			participant: participantId,
-			quiz: participant.quiz,
-			question: questionId,
-			answer,
-		});
-		res.json({ message: 'Participant answer submitted', participantAnswer });
+		let participantAnswer = await ParticipantAnswer.findOne({ participant: participantId, question: questionId });
+		if (participantAnswer) {
+			participantAnswer.answer = answer;
+			await participantAnswer.save();
+			res.json({ message: 'Participant answer updated', participantAnswer });
+			return;
+		} else {
+			participantAnswer = await ParticipantAnswer.create({
+				participant: participantId,
+				quiz: participant.quiz,
+				question: questionId,
+				answer,
+			});
+			res.json({ message: 'Participant answer submitted', participantAnswer });
+		}
 	} catch (error) {
 		next(error);
 	}
