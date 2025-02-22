@@ -110,6 +110,7 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 		const newQuestionIds = [];
 
 		for (const question of questions) {
+			question.quiz = quiz._id;
 			if (question?._id) {
 				const q = await Question.findById(question._id);
 				if (!q) {
