@@ -100,6 +100,17 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 			return;
 		}
 
+		const quiz = await Quiz.findById(participant.quiz);
+		if (!quiz) {
+			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
+
+		if (quiz.isActive === false) {
+			res.status(401).json({ message: 'Quiz is not active, answers cannot be submitted' });
+			return;
+		}
+
 		const participantAnswer = await ParticipantAnswer.create({
 			participant: participantId,
 			quiz: participant.quiz,
