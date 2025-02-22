@@ -8,7 +8,12 @@ export const createParticipant = async (req: Request, res: Response, next: NextF
 		const { quizId, name, studentId } = req.body;
 		const quiz = await Quiz.findById(quizId);
 		if (!quiz) {
-			res.status(404).json({ message: 'Quiz not found' });
+			res.status(404).json({ message: 'Quiz not found', participant: null });
+			return;
+		}
+
+		if (quiz.isActive === false) {
+			res.status(401).json({ message: 'Quiz is not active, please contact the creator to activate it' });
 			return;
 		}
 
@@ -28,40 +33,14 @@ export const createParticipant = async (req: Request, res: Response, next: NextF
 
 export const getParticipant = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { id } = req.params;
-		const participant = await Participant.findById(id);
+		const { participantId } = req.params;
+		const participant = await Participant.findById(participantId);
 		if (!participant) {
-			res.status(404).json({ message: 'Participant not found' });
+			res.status(404).json({ message: 'Participant not found', participant: null });
 			return;
 		}
 
 		res.json({ message: 'Participant fetched', participant });
-	} catch (error) {
-		next(error);
-	}
-};
-
-export const getParticipants = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const { quizId } = req.params;
-		const participants = await Participant.find({ quiz: quizId });
-		res.json({ message: 'Participants fetched', participants });
-	} catch (error) {
-		next(error);
-	}
-};
-
-export const updateParticipant = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const { id } = req.params;
-		const { name, studentId, isCompleted } = req.body;
-		const participant = await Participant.findByIdAndUpdate(id, { name, studentId, isCompleted }, { new: true });
-		if (!participant) {
-			res.status(404).json({ message: 'Participant not found' });
-			return;
-		}
-
-		res.json({ message: 'Participant updated', participant });
 	} catch (error) {
 		next(error);
 	}
@@ -72,13 +51,13 @@ export const getParticipantAnswer = async (req: Request, res: Response, next: Ne
 		const { questionId, participantId } = req.params;
 		const participant = await Participant.findById(participantId);
 		if (!participant) {
-			res.status(404).json({ message: 'Participant not found' });
+			res.status(404).json({ message: 'Participant not found', question: null });
 			return;
 		}
 
 		const question = await Question.findById(questionId);
 		if (!question) {
-			res.status(404).json({ message: 'Question not found' });
+			res.status(404).json({ message: 'Question not found', question: null });
 			return;
 		}
 
@@ -105,7 +84,7 @@ export const getParticipantAnswers = async (req: Request, res: Response, next: N
 	}
 };
 
-export const submitParticipantAnswer = async (req: Request, res: Response, next: NextFunction) => {
+export const updateParticipantAnswer = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { participantId, questionId } = req.params;
 		const { answer } = req.body;

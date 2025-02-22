@@ -4,7 +4,7 @@ import {
 	getParticipant,
 	getParticipantAnswers,
 	markParticipantFinished,
-	submitParticipantAnswer,
+	updateParticipantAnswer,
 } from '../controllers/participantController';
 
 const participantRouter = express.Router();
@@ -32,8 +32,8 @@ participantRouter.get('/:participantId', getParticipant);
 participantRouter.post('/', createParticipant);
 
 /**
- * @api {post} /participant/:participantId/question/:questionId/answer Submit Participant Answer
- * @apiName SubmitParticipantAnswer
+ * @api {post} /participant/:participantId/question/:questionId/answer Update Participant Answer
+ * @apiName UpdateParticipantAnswer
  * @apiGroup Participant
  * @apiPermission Public
  *
@@ -41,7 +41,7 @@ participantRouter.post('/', createParticipant);
  * @apiParam {String} questionId The id of the question
  * @apiParam {String} answer The answer of the participant
  */
-participantRouter.post('/:participantId/question/:questionId', submitParticipantAnswer);
+participantRouter.post('/:participantId/question/:questionId', updateParticipantAnswer);
 /**
  * @api {get} /participant/:participantId/answers Get Participant Answers
  * @apiName GetParticipantAnswers
