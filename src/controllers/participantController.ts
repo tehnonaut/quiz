@@ -132,3 +132,19 @@ export const submitParticipantAnswer = async (req: Request, res: Response, next:
 		next(error);
 	}
 };
+
+export const markParticipantFinished = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { participantId } = req.params;
+		const participant = await Participant.findById(participantId);
+		if (!participant) {
+			res.status(404).json({ message: 'Participant not found' });
+			return;
+		}
+		participant.isCompleted = true;
+		await participant.save();
+		res.json({ message: 'Participant marked as finished', participant });
+	} catch (error) {
+		next(error);
+	}
+};

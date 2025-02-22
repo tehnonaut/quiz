@@ -3,8 +3,8 @@ import {
 	createParticipant,
 	getParticipant,
 	getParticipantAnswers,
+	markParticipantFinished,
 	submitParticipantAnswer,
-	updateParticipant,
 } from '../controllers/participantController';
 
 const participantRouter = express.Router();
@@ -32,18 +32,6 @@ participantRouter.get('/:participantId', getParticipant);
 participantRouter.post('/', createParticipant);
 
 /**
- * @api {put} /participant/:participantId Update Participant
- * @apiName UpdateParticipant
- * @apiGroup Participant
- * @apiPermission Public
- *
- * @apiBody {String} name The name of the participant
- * @apiBody {String} studentId The studentId of the participant
- * @apiBody {Boolean} isCompleted The completion status of the participant
- */
-participantRouter.put('/:participantId', updateParticipant);
-
-/**
  * @api {post} /participant/:participantId/question/:questionId/answer Submit Participant Answer
  * @apiName SubmitParticipantAnswer
  * @apiGroup Participant
@@ -63,5 +51,15 @@ participantRouter.post('/:participantId/question/:questionId', submitParticipant
  * @apiParam {String} participantId The id of the participant
  */
 participantRouter.get('/:participantId/answers', getParticipantAnswers);
+
+/**
+ * @api {get} /participant/:participantId/finished Mark Participant Finished
+ * @apiName MarkParticipantFinished
+ * @apiGroup Participant
+ * @apiPermission Public
+ *
+ * @apiParam {String} participantId The id of the participant
+ */
+participantRouter.get('/:participantId/finished', markParticipantFinished);
 
 export default participantRouter;
