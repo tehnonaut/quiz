@@ -40,7 +40,7 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 		if (!u && !quiz.isActive) {
 			quiz.questions = [];
 			res
-				.status(404)
+				.status(401)
 				.json({ message: 'Quiz is not active, please contact the creator to activate it', quiz, participants });
 			return;
 		}
