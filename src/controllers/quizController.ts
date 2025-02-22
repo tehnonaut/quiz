@@ -22,7 +22,7 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 		const { quizId } = req.params;
 
 		let quiz: IQuiz | null = null;
-		let participants: IParticipant[] | null = null;
+		let participants: IParticipant[] = [];
 		if (!u) {
 			// User is a student, so we need to show the quiz without the correct answers
 			quiz = await Quiz.findById(quizId).populate('questions');
@@ -33,12 +33,15 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 		}
 
 		if (!quiz) {
-			res.status(404).json({ message: 'Quiz not found' });
+			res.status(404).json({ message: 'Quiz not found', quiz: null, participants: [] });
 			return;
 		}
 
-		if (!u && quiz.isActive == false) {
-			res.status(404).json({ message: 'Quiz is not active, please contact the creator to activate it' });
+		if (!u && !quiz.isActive) {
+			quiz.questions = [];
+			res
+				.status(404)
+				.json({ message: 'Quiz is not active, please contact the creator to activate it', quiz, participants });
 			return;
 		}
 
