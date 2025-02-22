@@ -60,6 +60,6 @@ participantRouter.get('/:participantId/answers', getParticipantAnswers);
  *
  * @apiParam {String} participantId The id of the participant
  */
-participantRouter.get('/:participantId/finished', markParticipantAsFinished);
+participantRouter.get('/:participantId/finish', markParticipantAsFinished);
 
 export default participantRouter;
