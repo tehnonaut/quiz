@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import Quiz, { IQuiz } from '../models/quizModel';
 import { IUserToken } from '../models/userModel';
-import Question from '../models/questionModel';
+import Question, { IQuestion } from '../models/questionModel';
 import Participant, { IParticipant } from '../models/participantModel';
-import ParticipantAnswer from '../models/participantAnswerModel';
+import ParticipantAnswer, { IParticipantAnswer } from '../models/participantAnswerModel';
 
 export const getQuizList = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -174,6 +174,14 @@ export const getQuizParticipants = async (req: Request, res: Response, next: Nex
 		next(error);
 	}
 };
+
+// Rename the interface to avoid conflict
+type QuizResult = {
+	question: IQuestion;
+	answer: IParticipantAnswer | null;
+	correct: boolean;
+};
+
 export const getQuizParticipantResults = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const u = req.user as IUserToken;
@@ -185,6 +193,8 @@ export const getQuizParticipantResults = async (req: Request, res: Response, nex
 			return;
 		}
 
+		const questions = quiz.questions as unknown as IQuestion[];
+
 		const participant = await Participant.findById(participantId);
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });
@@ -193,19 +203,52 @@ export const getQuizParticipantResults = async (req: Request, res: Response, nex
 
 		const participantAnswers = await ParticipantAnswer.find({
 			participant: participantId,
-			question: { $in: quiz.questions },
 		});
 
-		const results = participantAnswers.map((answer) => {
-			const question = quiz.questions.find((q) => q._id.equals(answer.question)) as any;
-			return {
-				question: question?.question,
-				answer: answer.answer,
-				correct: question?.correctAnswers.includes(answer.answer),
-			};
+		const results: QuizResult[] = [];
+
+		for (const answer of participantAnswers) {
+			const q = questions.find((q) => q._id.toString() === answer.question.toString());
+			if (!q) {
+				continue;
+			}
+
+			const correctAnswers = q.correctAnswers as string[];
+
+			const correct = correctAnswers.every((a) => answer.answer.includes(a));
+
+			let a = answer as unknown as IParticipantAnswer | null;
+
+			if (!answer) {
+				a = null;
+			}
+
+			results.push({
+				question: q,
+				answer: a,
+				correct: correct,
+			});
+		}
+
+		for (const question of questions) {
+			const result = results.find((r) => r.question._id.toString() === question._id.toString());
+			if (!result) {
+				results.push({
+					question: question,
+					answer: null,
+					correct: false,
+				});
+			}
+		}
+
+		//sort the results like in the quiz.questions array
+		results.sort((a, b) => {
+			const aIndex = questions.findIndex((q) => q._id.toString() === a.question._id.toString());
+			const bIndex = questions.findIndex((q) => q._id.toString() === b.question._id.toString());
+			return aIndex - bIndex;
 		});
 
-		res.json({ message: 'Quiz results fetched', quiz, participant, results });
+		res.json({ message: 'Quiz results fetched', quiz, questions, participant, results });
 	} catch (error) {
 		next(error);
 	}
