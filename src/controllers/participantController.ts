@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Quiz from '../models/quizModel';
 import Participant from '../models/participantModel';
 import ParticipantAnswer from '../models/participantAnswerModel';
-import Question from '../models/questionModel';
+import Question, { QuestionType } from '../models/questionModel';
 export const createParticipant = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { quizId, name, studentId } = req.body;
@@ -94,10 +94,18 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 			return;
 		}
 
-		const question = await Question.findById(questionId);
+		let isCorrect = undefined;
+		const question = await Question.findById(questionId, '+correctAnswers');
 		if (!question) {
 			res.status(404).json({ message: 'Question not found' });
 			return;
+		}
+
+		//check if the answer is correct
+		if (question.correctAnswers.length > 0) {
+			if (question.type === QuestionType.CHOICE) {
+				isCorrect = question.correctAnswers.includes(answer);
+			}
 		}
 
 		const quiz = await Quiz.findById(participant.quiz);
@@ -114,6 +122,7 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 		let participantAnswer = await ParticipantAnswer.findOne({ participant: participantId, question: questionId });
 		if (participantAnswer) {
 			participantAnswer.answer = answer;
+			participantAnswer.isCorrect = isCorrect;
 			await participantAnswer.save();
 			res.json({ message: 'Participant answer updated', participantAnswer });
 			return;
@@ -123,6 +132,7 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 				quiz: participant.quiz,
 				question: questionId,
 				answer,
+				isCorrect,
 			});
 			res.json({ message: 'Participant answer submitted', participantAnswer });
 		}

@@ -14,7 +14,6 @@ export interface IQuestion extends Document {
 	answers: string[];
 	correctAnswers: string[]; // select: false means that the correctAnswer will not be returned in the response
 	quiz: IQuiz['_id'];
-
 	isDeleted: boolean;
 	createdAt: Date;
 	updatedAt: Date;

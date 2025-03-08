@@ -9,6 +9,7 @@ export interface IParticipantAnswer extends Document {
 	quiz: IQuiz['_id']; // id of the quiz
 	question: IQuestion['_id']; // id of the question
 	answer: string;
+	isCorrect?: boolean; // if the answer is correct
 	createdAt: Date; // date of creation
 	updatedAt: Date; // date of update
 }
@@ -19,6 +20,7 @@ const participantAnswerSchema = new Schema<IParticipantAnswer>(
 		quiz: { type: Schema.Types.ObjectId, ref: 'Quiz', required: true },
 		question: { type: Schema.Types.ObjectId, ref: 'Question', required: true },
 		answer: { type: String, required: true }, // answer of the participant
+		isCorrect: { type: Boolean, default: undefined }, // if the answer is correct
 	},
 	{ timestamps: true }
 );
