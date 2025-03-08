@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Quiz, { IQuiz } from '../models/quizModel';
 import { IUserToken } from '../models/userModel';
-import Question, { IQuestion } from '../models/questionModel';
+import Question, { IQuestion, QuestionType } from '../models/questionModel';
 import Participant, { IParticipant } from '../models/participantModel';
 import ParticipantAnswer, { IParticipantAnswer } from '../models/participantAnswerModel';
 
@@ -179,7 +179,7 @@ export const getQuizParticipants = async (req: Request, res: Response, next: Nex
 type QuizResult = {
 	question: IQuestion;
 	answer: IParticipantAnswer | null;
-	correct: boolean;
+	correct: boolean | undefined;
 };
 
 export const getQuizParticipantResults = async (req: Request, res: Response, next: NextFunction) => {
@@ -213,9 +213,11 @@ export const getQuizParticipantResults = async (req: Request, res: Response, nex
 				continue;
 			}
 
-			const correctAnswers = q.correctAnswers as string[];
-
-			const correct = correctAnswers.every((a) => answer.answer.includes(a));
+			let correct = undefined;
+			if (q.type == QuestionType.CHOICE) {
+				const correctAnswers = q.correctAnswers as string[];
+				correct = correctAnswers.every((a) => answer.answer.includes(a));
+			}
 
 			let a = answer as unknown as IParticipantAnswer | null;
 
