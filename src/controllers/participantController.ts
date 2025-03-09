@@ -139,6 +139,15 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 			return;
 		}
 
+		//check if the time ran out (quiz duration in minutes)
+		const quizDuration = quiz.duration * 60 * 1000;
+		const participantAnswerTime = participant.createdAt;
+		const timeDifference = new Date().getTime() - new Date(participantAnswerTime).getTime();
+		if (timeDifference > quizDuration) {
+			res.status(401).json({ message: 'Quiz time ran out, answers cannot be submitted' });
+			return;
+		}
+
 		let participantAnswer = await ParticipantAnswer.findOne({ participant: participantId, question: questionId });
 		if (participantAnswer) {
 			// Update Answer
