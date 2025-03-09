@@ -46,7 +46,7 @@ export const getParticipant = async (req: Request, res: Response, next: NextFunc
 		const participantResponse: any = { ...participant.toObject() };
 		delete participantResponse.points;
 		delete participantResponse.isGraded;
-		delete participantResponse.isCompleted;
+		delete participantResponse.hasCompleted;
 
 		res.json({ message: 'Participant fetched', participant: participantResponse });
 	} catch (error) {
@@ -185,14 +185,14 @@ export const markParticipantAsFinished = async (req: Request, res: Response, nex
 			res.status(404).json({ message: 'Participant not found' });
 			return;
 		}
-		participant.isCompleted = true;
+		participant.hasCompleted = true;
 		await participant.save();
 
 		//clean the response
 		const participantResponse: any = { ...participant.toObject() };
 		delete participantResponse.points;
 		delete participantResponse.isGraded;
-		delete participantResponse.isCompleted;
+		delete participantResponse.hasCompleted;
 
 		res.json({ message: 'Participant marked as finished', participant: participantResponse });
 	} catch (error) {
