@@ -12,7 +12,8 @@ export interface IQuiz extends Document {
 
 	questions: IQuestion['_id'][];
 
-	duration: number; // in minutes
+	duration: number; // in minute
+	points: number;
 	isActive: boolean;
 
 	isDeleted: boolean;
@@ -28,6 +29,7 @@ const quizSchema = new Schema<IQuiz>(
 		creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 		questions: { type: [Schema.Types.ObjectId], ref: 'Question', required: true },
 		duration: { type: Number, default: 45 },
+		points: { type: Number, default: 0 },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 	},

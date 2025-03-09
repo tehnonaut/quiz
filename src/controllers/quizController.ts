@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Quiz, { IQuiz } from '../models/quizModel';
 import { IUserToken } from '../models/userModel';
-import Question, { IQuestion } from '../models/questionModel';
+import Question, { IQuestion, QuestionType } from '../models/questionModel';
 import Participant, { IParticipant } from '../models/participantModel';
 import ParticipantAnswer, { IParticipantAnswer } from '../models/participantAnswerModel';
 
@@ -82,9 +82,28 @@ export const createQuiz = async (req: Request, res: Response, next: NextFunction
 			return aIndex - bIndex;
 		});
 
-		await quiz.save();
+		quiz.points = quiz.questions.reduce((acc, curr) => acc + (curr as unknown as IQuestion).points, 0);
 
-		res.json({ message: 'Quiz created', quiz });
+		const newQuiz = await quiz.save();
+
+		const updatedQuiz = await Quiz.findById(newQuiz._id).populate('questions');
+		if (!updatedQuiz) {
+			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
+
+		let points = 0;
+		for (const question of updatedQuiz.questions) {
+			const q = question as unknown as IQuestion;
+			if (q && !isNaN(q.points)) {
+				points += q.points;
+			}
+		}
+
+		updatedQuiz.points = points;
+		await updatedQuiz.save();
+
+		res.json({ message: 'Quiz created', quiz: updatedQuiz });
 	} catch (error) {
 		next(error);
 	}
@@ -133,7 +152,25 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 
 		await quiz.save();
 
-		res.json({ message: 'Quiz updated', quiz });
+		//get quiz again with questions populated
+		const updatedQuiz = await Quiz.findById(quizId).populate('questions');
+		if (!updatedQuiz) {
+			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
+
+		let points = 0;
+		for (const question of updatedQuiz.questions) {
+			const q = question as unknown as IQuestion;
+			if (q && !isNaN(q.points)) {
+				points += q.points;
+			}
+		}
+
+		updatedQuiz.points = points;
+		await updatedQuiz.save();
+
+		res.json({ message: 'Quiz updated', quiz: updatedQuiz });
 	} catch (error) {
 		next(error);
 	}
@@ -273,6 +310,70 @@ export const getQuizQuestion = async (req: Request, res: Response, next: NextFun
 		}
 
 		res.json({ message: 'Quiz question fetched', quiz, question });
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const reviewParticipantAnswer = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const u = req.user as IUserToken;
+		const { quizId, participantId, answerId } = req.params;
+
+		const isCorrect = req.body.isCorrect;
+		let points = req.body.points;
+
+		const quiz = await Quiz.findOne({ _id: quizId, creator: u.id });
+		if (!quiz) {
+			res.status(404).json({ message: 'Quiz not found' });
+			return;
+		}
+
+		const participantAnswer = await ParticipantAnswer.findOne({ _id: answerId })
+			.populate('question')
+			.populate('participant');
+		if (!participantAnswer) {
+			res.status(404).json({ message: 'Participant answer not found' });
+			return;
+		}
+
+		const question = participantAnswer.question as unknown as IQuestion;
+		if (!question) {
+			res.status(404).json({ message: 'Question not found' });
+			return;
+		}
+
+		// choice gives full points if correct
+		if (question.type === QuestionType.CHOICE) {
+			if (isCorrect) {
+				points = question.points;
+			}
+		}
+
+		participantAnswer.isCorrect = isCorrect;
+		if (points > question.points) points = question.points;
+		participantAnswer.points = points;
+
+		await participantAnswer.save();
+
+		// Find the participant, check if all the answers are graded if so, set the participant as graded
+		const participant = participantAnswer.participant as unknown as IParticipant;
+		if (!participant) {
+			res.status(404).json({ message: 'Participant not found' });
+			return;
+		}
+
+		const participantAnswers = await ParticipantAnswer.find({ participant: participantId, quiz: quizId });
+		if (participantAnswers.every((a) => a.isCorrect !== undefined)) {
+			//count points
+			const points = participantAnswers.reduce((acc, curr) => acc + (curr?.points ?? 0), 0);
+			participant.points = points;
+
+			participant.isGraded = true;
+			await participant.save();
+		}
+
+		res.json({ message: 'Participant answer reviewed', answer: participantAnswer, question });
 	} catch (error) {
 		next(error);
 	}

@@ -10,6 +10,7 @@ export interface IParticipantAnswer extends Document {
 	question: IQuestion['_id']; // id of the question
 	answer: string;
 	isCorrect?: boolean; // if the answer is correct
+	points: number; // points earned by the participant for the answer
 	createdAt: Date; // date of creation
 	updatedAt: Date; // date of update
 }
@@ -21,6 +22,7 @@ const participantAnswerSchema = new Schema<IParticipantAnswer>(
 		question: { type: Schema.Types.ObjectId, ref: 'Question', required: true },
 		answer: { type: String, required: true }, // answer of the participant
 		isCorrect: { type: Boolean, default: undefined }, // if the answer is correct
+		points: { type: Number, default: 0 }, // points of the answer
 	},
 	{ timestamps: true }
 );

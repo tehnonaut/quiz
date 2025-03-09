@@ -14,6 +14,7 @@ export interface IQuestion extends Document {
 	answers: string[];
 	correctAnswers: string[]; // select: false means that the correctAnswer will not be returned in the response
 	quiz: IQuiz['_id'];
+	points: number;
 	isDeleted: boolean;
 	createdAt: Date;
 	updatedAt: Date;
@@ -26,6 +27,7 @@ const questionSchema = new Schema<IQuestion>(
 		answers: [{ type: String, required: false, default: [] }],
 		correctAnswers: [{ type: String, required: false, default: [], trim: true, select: false }], // select: false means that the correctAnswer will not be returned in the response
 		quiz: { type: Schema.Types.ObjectId, ref: 'Quiz', required: true },
+		points: { type: Number, required: true, default: 1 },
 		isDeleted: { type: Boolean, default: false },
 	},
 	{ timestamps: true }

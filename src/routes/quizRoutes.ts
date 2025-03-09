@@ -7,6 +7,7 @@ import {
 	getQuizParticipants,
 	getQuizParticipantResults,
 	getQuizQuestion,
+	reviewParticipantAnswer,
 } from '../controllers/quizController';
 import { getQuizList, updateQuiz } from '../controllers/quizController';
 import { answerQuestion } from '../controllers/questionController';
@@ -38,6 +39,7 @@ quizRouter.get('/', authMiddleware, getQuizList);
  * @apiBody {Object[]} questions The questions of the quiz (array of question objects)
  * * @apiBody {string} question.type  - The question type (choice, answer)
  * * @apiBody {string[]} question.question - The question text
+ * * @apiBody {number} question.points - The points of the question*
  * * @apiBody {string[]} question.answers - The answers of the question (array of strings)
  * * @apiBody {string[]} question.correctAnswers - The correct answers of the question (array of strings)
  */
@@ -60,8 +62,10 @@ quizRouter.post('/', authMiddleware, createQuiz);
  * * @apiBody {string} question._id - The id of the question
  * * @apiBody {string} question.type  - The question type (choice, answer)
  * * @apiBody {string[]} question.question - The question text
+ * * @apiBody {number} question.points - The points of the question
  * * @apiBody {string[]} question.answers - The answers of the question (array of strings)
  * * @apiBody {string[]} question.correctAnswers - The correct answers of the question (array of strings)
+
  */
 quizRouter.put('/:quizId', authMiddleware, updateQuiz);
 
@@ -89,6 +93,22 @@ quizRouter.get('/:quizId/participant', authMiddleware, getQuizParticipants);
  * @apiParam {String} participantId The id of the participant
  */
 quizRouter.get('/:quizId/participant/:participantId', authMiddleware, getQuizParticipantResults);
+
+//Review Single Question Answer
+
+/**
+ * @api {get} /quiz/:quizId/results/:participantId/answer/:answerId Review of a participant answer
+ * @apiName ReviewParticipantAnswer
+ * @apiGroup Quiz
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ *
+ * @apiParam {String} quizId The id of the quiz
+ * @apiParam {String} participantId The id of the participant
+ * @apiParam {String} answerId The id of the answer
+ */
+quizRouter.post('/:quizId/results/:participantId/answer/:answerId', authMiddleware, reviewParticipantAnswer);
 
 /**
  * @api {get} /quiz/:quizId Get Quiz

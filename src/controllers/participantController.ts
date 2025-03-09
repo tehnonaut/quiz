@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import Quiz from '../models/quizModel';
 import Participant from '../models/participantModel';
-import ParticipantAnswer from '../models/participantAnswerModel';
+import ParticipantAnswer, { IParticipantAnswer } from '../models/participantAnswerModel';
 import Question, { QuestionType } from '../models/questionModel';
+import { IQuiz } from '../models/quizModel';
+
 export const createParticipant = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { quizId, name, studentId } = req.body;
@@ -40,7 +42,13 @@ export const getParticipant = async (req: Request, res: Response, next: NextFunc
 			return;
 		}
 
-		res.json({ message: 'Participant fetched', participant });
+		//clean the response
+		const participantResponse: any = { ...participant.toObject() };
+		delete participantResponse.points;
+		delete participantResponse.isGraded;
+		delete participantResponse.isCompleted;
+
+		res.json({ message: 'Participant fetched', participant: participantResponse });
 	} catch (error) {
 		next(error);
 	}
@@ -78,7 +86,15 @@ export const getParticipantAnswers = async (req: Request, res: Response, next: N
 		}
 
 		const answers = await ParticipantAnswer.find({ participant: participantId });
-		res.json({ message: 'Participant answers fetched', answers });
+
+		const answersResponse = answers.map((answer) => {
+			const answerResponse: any = { ...answer.toObject() };
+			delete answerResponse.isCorrect;
+			delete answerResponse.points;
+			return answerResponse;
+		});
+
+		res.json({ message: 'Participant answers fetched', answers: answersResponse });
 	} catch (error) {
 		next(error);
 	}
@@ -88,13 +104,14 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 	try {
 		const { participantId, questionId } = req.params;
 		const { answer } = req.body;
-		const participant = await Participant.findById(participantId);
+		const participant = await Participant.findById(participantId, '+points').populate('quiz');
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });
 			return;
 		}
 
 		let isCorrect = undefined;
+		let points = 0;
 		const question = await Question.findById(questionId, '+correctAnswers');
 		if (!question) {
 			res.status(404).json({ message: 'Question not found' });
@@ -105,10 +122,13 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 		if (question.correctAnswers.length > 0) {
 			if (question.type === QuestionType.CHOICE) {
 				isCorrect = question.correctAnswers.includes(answer);
+				if (isCorrect) {
+					points = question.points;
+				}
 			}
 		}
 
-		const quiz = await Quiz.findById(participant.quiz);
+		const quiz = participant.quiz as unknown as IQuiz;
 		if (!quiz) {
 			res.status(404).json({ message: 'Quiz not found' });
 			return;
@@ -121,21 +141,28 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 
 		let participantAnswer = await ParticipantAnswer.findOne({ participant: participantId, question: questionId });
 		if (participantAnswer) {
+			// Update Answer
 			participantAnswer.answer = answer;
-			participantAnswer.isCorrect = isCorrect;
+			participantAnswer.isCorrect = isCorrect ?? undefined;
+			participantAnswer.points = points;
 			await participantAnswer.save();
-			res.json({ message: 'Participant answer updated', participantAnswer });
-			return;
 		} else {
+			// Create Answer
 			participantAnswer = await ParticipantAnswer.create({
 				participant: participantId,
 				quiz: participant.quiz,
 				question: questionId,
 				answer,
 				isCorrect,
+				points,
 			});
-			res.json({ message: 'Participant answer submitted', participantAnswer });
 		}
+
+		//clean the response
+		const answerResponse: any = { ...(participantAnswer as unknown as IParticipantAnswer).toObject() };
+		delete answerResponse.points;
+		delete answerResponse.isCorrect;
+		res.json({ message: 'Participant answer updated', answer: answerResponse });
 	} catch (error) {
 		next(error);
 	}
@@ -151,7 +178,14 @@ export const markParticipantAsFinished = async (req: Request, res: Response, nex
 		}
 		participant.isCompleted = true;
 		await participant.save();
-		res.json({ message: 'Participant marked as finished', participant });
+
+		//clean the response
+		const participantResponse: any = { ...participant.toObject() };
+		delete participantResponse.points;
+		delete participantResponse.isGraded;
+		delete participantResponse.isCompleted;
+
+		res.json({ message: 'Participant marked as finished', participant: participantResponse });
 	} catch (error) {
 		next(error);
 	}
