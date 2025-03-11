@@ -364,14 +364,18 @@ export const reviewParticipantAnswer = async (req: Request, res: Response, next:
 		}
 
 		const participantAnswers = await ParticipantAnswer.find({ participant: participantId, quiz: quizId });
-		if (participantAnswers.every((a) => a.isCorrect !== undefined)) {
-			//count points
-			const points = participantAnswers.reduce((acc, curr) => acc + (curr?.points ?? 0), 0);
-			participant.points = points;
 
+		//count points
+		const totalPoints = participantAnswers.reduce((acc, curr) => acc + (curr?.points ?? 0), 0);
+		participant.points = totalPoints;
+
+		if (participantAnswers.every((a) => a.isCorrect !== undefined)) {
 			participant.isGraded = true;
-			await participant.save();
+		} else {
+			participant.isGraded = false;
 		}
+
+		await participant.save();
 
 		res.json({ message: 'Participant answer reviewed', answer: participantAnswer, question });
 	} catch (error) {
