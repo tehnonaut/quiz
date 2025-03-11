@@ -82,24 +82,21 @@ export const createQuiz = async (req: Request, res: Response, next: NextFunction
 			return aIndex - bIndex;
 		});
 
-		quiz.points = quiz.questions.reduce((acc, curr) => acc + (curr as unknown as IQuestion).points, 0);
-
 		const newQuiz = await quiz.save();
-
 		const updatedQuiz = await Quiz.findById(newQuiz._id).populate('questions');
 		if (!updatedQuiz) {
 			res.status(404).json({ message: 'Quiz not found' });
 			return;
 		}
+		quiz.points = updatedQuiz.questions.reduce((acc, curr) => acc + (curr as unknown as IQuestion).points, 0);
 
 		let points = 0;
 		for (const question of updatedQuiz.questions) {
 			const q = question as unknown as IQuestion;
-			if (q && !isNaN(q.points)) {
+			if (q && !isNaN(q?.points)) {
 				points += q.points;
 			}
 		}
-
 		updatedQuiz.points = points;
 		await updatedQuiz.save();
 
