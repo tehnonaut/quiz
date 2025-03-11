@@ -272,6 +272,18 @@ export const getQuizParticipantResults = async (req: Request, res: Response, nex
 			}
 		}
 
+		//count points
+		const totalPoints = participantAnswers.reduce((acc, curr) => acc + (curr?.points ?? 0), 0);
+		participant.points = totalPoints;
+
+		if (participantAnswers.every((a) => a.isCorrect !== undefined)) {
+			participant.isGraded = true;
+		} else {
+			participant.isGraded = false;
+		}
+
+		await participant.save();
+
 		//sort the results like in the quiz.questions array
 		results.sort((a, b) => {
 			const aIndex = questions.findIndex((q) => q._id.toString() === a.question._id.toString());
