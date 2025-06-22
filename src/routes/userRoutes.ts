@@ -1,5 +1,5 @@
 import express from 'express';
-import { getUser, changePassword, createUser, authUser, refreshUserToken } from '../controllers/userController';
+import { getUser, changePassword, createUser, authUser, refreshUserToken, logoutUser } from '../controllers/userController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 
 const userRouter = express.Router();
@@ -58,5 +58,15 @@ userRouter.get('/refresh-token', authMiddleware, refreshUserToken);
  * @apiBody {String} password The password of the user
  */
 userRouter.put('/', authMiddleware, changePassword);
+
+/**
+ * @api {post} /user/logout Logout User
+ * @apiName LogoutUser
+ * @apiGroup User
+ * @apiPermission User
+ *
+ * @apiHeader {String} Authorization Bearer token
+ */
+userRouter.post('/logout', authMiddleware, logoutUser);
 
 export default userRouter;
