@@ -82,9 +82,9 @@ export const refreshUserToken = async (req: Request, res: Response, next: NextFu
 };
 
 export const changePassword = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-                const { password } = req.body;
-                const u = req.user as IUserToken;
+	try {
+		const { password } = req.body;
+		const u = req.user as IUserToken;
 
 		const user = await User.findById(u.id);
 		if (!user) {
@@ -94,15 +94,15 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
 
 		user.password = password;
 
-                await user.save();
-                res.json({ message: 'Password updated' });
-        } catch (error) {
-                next(error);
-        }
+		await user.save();
+		res.json({ message: 'Password updated' });
+	} catch (error) {
+		next(error);
+	}
 };
 
 export const logoutUser = async (req: Request, res: Response, _next: NextFunction) => {
-        const u = req.user as IUserToken;
-        addTokenToBlacklist(u);
-        res.json({ message: 'Logout successful' });
+	const u = req.user as IUserToken;
+	addTokenToBlacklist(u);
+	res.json({ message: 'Logout successful' });
 };
