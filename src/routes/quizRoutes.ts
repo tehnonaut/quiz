@@ -97,7 +97,7 @@ quizRouter.get('/:quizId/participant/:participantId', authMiddleware, getQuizPar
 //Review Single Question Answer
 
 /**
- * @api {get} /quiz/:quizId/results/:participantId/answer/:answerId Review of a participant answer
+ * @api {post} /quiz/:quizId/results/:participantId/answer/:answerId Review of a participant answer
  * @apiName ReviewParticipantAnswer
  * @apiGroup Quiz
  * @apiPermission User
