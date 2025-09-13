@@ -1,4 +1,5 @@
 name: Deploy to VPS - PROD
+permissions: {}
 
 on:
   push:
