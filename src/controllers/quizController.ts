@@ -26,11 +26,14 @@ export const getQuiz = async (req: Request, res: Response, next: NextFunction) =
 		let participants: IParticipant[] = [];
 		if (!u) {
 			// User is a student, so we need to show the quiz without the correct answers
-			quiz = await Quiz.findById(quizId).populate('questions');
+			quiz = await Quiz.findOne({ _id: { $eq: quizId } }).populate('questions');
 		} else {
 			// User is a teacher, so we need to show the correct answers
-			quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).populate('questions', '+correctAnswers');
-			participants = await Participant.find({ quiz: quizId });
+			quiz = await Quiz.findOne({ _id: { $eq: quizId }, creator: { $eq: u.id } }).populate(
+				'questions',
+				'+correctAnswers'
+			);
+			participants = await Participant.find({ quiz: { $eq: quizId } });
 		}
 
 		if (!quiz) {
@@ -84,7 +87,8 @@ export const createQuiz = async (req: Request, res: Response, next: NextFunction
 		});
 
 		const newQuiz = await quiz.save();
-		const updatedQuiz = await Quiz.findById(newQuiz._id).populate('questions');
+		const updatedQuiz = await Quiz.findOne({ _id: { $eq: newQuiz._id } }).populate('questions');
+
 		if (!updatedQuiz) {
 			res.status(404).json({ message: 'Quiz not found' });
 			return;
@@ -132,12 +136,21 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 			const question = { type, question: questionText, answers, correctAnswers, points, quiz, _id } as IQuestion;
 			question.quiz = quiz._id;
 			if (question?._id) {
-				const q = await Question.findById(question._id);
+				const q = await Question.findOne({ _id: { $eq: question._id } });
 				if (!q) {
 					res.status(404).json({ message: 'Question not found' });
 					return;
 				}
-				await q.updateOne(question);
+				await q.updateOne({
+					$set: {
+						type: question.type,
+						question: question.question,
+						answers: question.answers,
+						correctAnswers: question.correctAnswers,
+						points: question.points,
+						quiz: question.quiz,
+					},
+				});
 				newQuestionIds.push(q._id);
 				quiz.questions = quiz.questions.map((q: mongoose.Types.ObjectId) =>
 					q.toString() === question._id.toString() ? q : q
@@ -155,7 +168,7 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 		await quiz.save();
 
 		//get quiz again with questions populated
-		const updatedQuiz = await Quiz.findById(quizId).populate('questions');
+		const updatedQuiz = await Quiz.findOne({ _id: { $eq: quizId } }).populate('questions');
 		if (!updatedQuiz) {
 			res.status(404).json({ message: 'Quiz not found' });
 			return;
@@ -233,7 +246,7 @@ export const getQuizParticipantResults = async (req: Request, res: Response, nex
 
 		const questions = quiz.questions as unknown as IQuestion[];
 
-		const participant = await Participant.findById(participantId);
+		const participant = await Participant.findOne({ _id: { $eq: participantId } });
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });
 			return;
@@ -306,9 +319,12 @@ export const getQuizQuestion = async (req: Request, res: Response, next: NextFun
 
 		let quiz: IQuiz | null = null;
 		if (u) {
-			quiz = await Quiz.findOne({ _id: quizId, creator: u.id }).populate('questions', '+correctAnswers');
+			quiz = await Quiz.findOne({ _id: { $eq: quizId }, creator: { $eq: u.id } }).populate(
+				'questions',
+				'+correctAnswers'
+			);
 		} else {
-			quiz = await Quiz.findById(quizId).populate('questions');
+			quiz = await Quiz.findOne({ _id: { $eq: quizId } }).populate('questions');
 		}
 
 		if (!quiz) {

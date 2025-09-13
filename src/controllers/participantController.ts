@@ -8,7 +8,7 @@ import { IQuiz } from '../models/quizModel';
 export const createParticipant = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { quizId, name, studentId } = req.body;
-		const quiz = await Quiz.findById(quizId);
+		const quiz = await Quiz.findOne({ _id: { $eq: quizId } });
 		if (!quiz) {
 			res.status(404).json({ message: 'Quiz not found', participant: null });
 			return;
@@ -36,7 +36,7 @@ export const createParticipant = async (req: Request, res: Response, next: NextF
 export const getParticipant = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { participantId } = req.params;
-		const participant = await Participant.findById(participantId);
+		const participant = await Participant.findOne({ _id: { $eq: participantId } });
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found', participant: null });
 			return;
@@ -57,13 +57,13 @@ export const getParticipant = async (req: Request, res: Response, next: NextFunc
 export const getParticipantAnswer = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { questionId, participantId } = req.params;
-		const participant = await Participant.findById(participantId);
+		const participant = await Participant.findOne({ _id: { $eq: participantId } });
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found', question: null });
 			return;
 		}
 
-		const question = await Question.findById(questionId);
+		const question = await Question.findOne({ _id: { $eq: questionId } });
 		if (!question) {
 			res.status(404).json({ message: 'Question not found', question: null });
 			return;
@@ -79,7 +79,7 @@ export const getParticipantAnswer = async (req: Request, res: Response, next: Ne
 export const getParticipantAnswers = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { participantId } = req.params;
-		const participant = await Participant.findById(participantId);
+		const participant = await Participant.findOne({ _id: { $eq: participantId } });
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });
 			return;
@@ -104,7 +104,7 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 	try {
 		const { participantId, questionId } = req.params;
 		const { answer } = req.body;
-		const participant = await Participant.findById(participantId, '+points').populate('quiz');
+		const participant = await Participant.findOne({ _id: { $eq: participantId } }, '+points').populate('quiz');
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });
 			return;
@@ -112,7 +112,7 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 
 		let isCorrect = undefined;
 		let points = 0;
-		const question = await Question.findById(questionId, '+correctAnswers');
+		const question = await Question.findOne({ _id: { $eq: questionId } }, '+correctAnswers');
 		if (!question) {
 			res.status(404).json({ message: 'Question not found' });
 			return;
@@ -183,7 +183,7 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 export const markParticipantAsFinished = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { participantId } = req.params;
-		const participant = await Participant.findById(participantId);
+		const participant = await Participant.findOne({ _id: { $eq: participantId } });
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });
 			return;

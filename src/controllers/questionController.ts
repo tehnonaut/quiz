@@ -10,7 +10,7 @@ export const answerQuestion = async (req: Request, res: Response, next: NextFunc
 		const participantId = req.body.participantId;
 		const answer = req.body.answer;
 
-		const question = await Question.findById(questionId).populate('quiz');
+		const question = await Question.findOne({ _id: { $eq: questionId } }).populate('quiz');
 		if (!question) {
 			res.status(404).json({ message: 'Question not found' });
 			return;
@@ -27,7 +27,7 @@ export const answerQuestion = async (req: Request, res: Response, next: NextFunc
 			return;
 		}
 
-		const participant = await Participant.findById(participantId);
+		const participant = await Participant.findOne({ _id: { $eq: participantId } });
 		if (!participant) {
 			res.status(404).json({ message: 'Participant not found' });
 			return;
