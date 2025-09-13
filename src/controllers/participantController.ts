@@ -19,7 +19,7 @@ export const createParticipant = async (req: Request, res: Response, next: NextF
 			return;
 		}
 
-		const existingParticipant = await Participant.findOne({ quiz: quizId, studentId });
+		const existingParticipant = await Participant.findOne({ quiz: { $eq: quizId }, studentId: { $eq: studentId } });
 		if (existingParticipant) {
 			// 202 Accepted
 			res.status(202).json({ message: 'Participant already exists', participant: existingParticipant });
@@ -148,7 +148,10 @@ export const updateParticipantAnswer = async (req: Request, res: Response, next:
 			return;
 		}
 
-		let participantAnswer = await ParticipantAnswer.findOne({ participant: participantId, question: questionId });
+		let participantAnswer = await ParticipantAnswer.findOne({
+			participant: { $eq: participantId },
+			question: { $eq: questionId },
+		});
 		if (participantAnswer) {
 			// Update Answer
 			participantAnswer.answer = answer;

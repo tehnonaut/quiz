@@ -4,6 +4,7 @@ import { IUserToken } from '../models/userModel';
 import Question, { IQuestion, QuestionType } from '../models/questionModel';
 import Participant, { IParticipant } from '../models/participantModel';
 import ParticipantAnswer, { IParticipantAnswer } from '../models/participantAnswerModel';
+import mongoose from 'mongoose';
 
 export const getQuizList = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -126,7 +127,9 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 
 		const newQuestionIds = [];
 
-		for (const question of questions) {
+		for (const questionObj of questions) {
+			const { type, question: questionText, answers, correctAnswers, points, quiz, _id } = questionObj;
+			const question = { type, question: questionText, answers, correctAnswers, points, quiz, _id } as IQuestion;
 			question.quiz = quiz._id;
 			if (question?._id) {
 				const q = await Question.findById(question._id);
@@ -136,7 +139,9 @@ export const updateQuiz = async (req: Request, res: Response, next: NextFunction
 				}
 				await q.updateOne(question);
 				newQuestionIds.push(q._id);
-				quiz.questions = quiz.questions.map((q) => (q.toString() === question._id.toString() ? q : q));
+				quiz.questions = quiz.questions.map((q: mongoose.Types.ObjectId) =>
+					q.toString() === question._id.toString() ? q : q
+				);
 			} else {
 				const q = await Question.create(question);
 				if (q) {

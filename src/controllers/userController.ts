@@ -24,7 +24,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 	try {
 		const { name, email, password } = req.body;
 
-		const existingUser = await User.findOne({ email });
+		const existingUser = await User.findOne({ email: { $eq: email } });
 		if (existingUser) {
 			res.status(400).json({ message: 'User already exists' });
 			return;
@@ -43,7 +43,7 @@ export const authUser = async (req: Request, res: Response, next: NextFunction) 
 	try {
 		const { email, password } = req.body;
 		//find one and select password
-		const user = await User.findOne({ email }).select('+password');
+		const user = await User.findOne({ email: { $eq: email } }).select('+password');
 
 		if (!user) {
 			res.status(401).json({ message: 'Invalid email or password' });

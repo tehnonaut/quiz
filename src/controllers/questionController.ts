@@ -34,7 +34,10 @@ export const answerQuestion = async (req: Request, res: Response, next: NextFunc
 		}
 
 		//find participant answer if exists
-		let participantAnswer = await ParticipantAnswer.findOne({ question: questionId, participant: participantId });
+		let participantAnswer = await ParticipantAnswer.findOne({
+			question: { $eq: questionId },
+			participant: { $eq: participantId },
+		});
 
 		if (!participantAnswer) {
 			//create answer
@@ -60,7 +63,7 @@ export const getQuestion = async (req: Request, res: Response, next: NextFunctio
 	try {
 		const { quizId, questionId } = req.params;
 
-		const question = await Question.findOne({ quiz: quizId, _id: questionId });
+		const question = await Question.findOne({ quiz: { $eq: quizId }, _id: { $eq: questionId } });
 		if (!question) {
 			res.status(404).json({ message: 'Question not found' });
 			return;
