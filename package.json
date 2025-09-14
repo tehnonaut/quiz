@@ -4,7 +4,7 @@
 	"description": "Project for making Quizzes",
 	"main": "dist/app.js",
 	"scripts": {
-		"test": "test",
+		"test": "node scripts/build-test.js",
 		"dev": "npx nodemon src/app.ts",
 		"start": "node dist/app.js",
 		"build": "npx tsc",

@@ -1,0 +1,39 @@
+name: Build Test
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run build test
+      run: npm test
+      
+    - name: Verify build artifacts exist
+      run: |
+        if [ ! -f "dist/app.js" ]; then
+          echo "❌ Main application build artifact missing"
+          exit 1
+        fi
+        echo "✅ Build artifacts verified"
